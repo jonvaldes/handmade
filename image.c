@@ -70,45 +70,45 @@ void deleteImage(Image * img){
     memset(img, 0, sizeof(Image));
 }
 
-void paint(PaintMode mode, Image * img, Framebuffer * fb, int xcenter, int ycenter){
-    const int startx = xcenter - img->width/2;
-    const int starty = ycenter - img->height/2;
+void paint(PaintMode mode, Image * src, Image * dst, int xcenter, int ycenter){
+    const int startx = xcenter - src->width/2;
+    const int starty = ycenter - src->height/2;
 
-    for( int iy = 0 ; (iy < img->height) && (starty + iy < fb->height); iy++){
+    for( int iy = 0 ; (iy < src->height) && (starty + iy < dst->height); iy++){
         const int y = starty + iy;
         if(y < 0){
             continue;
         }
         
-        for( int ix = 0 ; (ix < img->width) && (startx + ix < fb->width) ; ix++){
+        for( int ix = 0 ; (ix < src->width) && (startx + ix < dst->width) ; ix++){
             const int x = startx + ix;
             if(x < 0){
                 continue;
             }
-            uint8_t * fbPixel = fb->pixels + 4*(x + fb->width * y);
-            uint8_t * imgPixel = img->pixels + 4*(ix + img->width*iy);
+            uint8_t * dstPixel = dst->pixels + 4*(x + dst->width * y);
+            uint8_t * srcPixel = src->pixels + 4*(ix + src->width*iy);
 
-            const int alpha = (int)*imgPixel;
+            const int alpha = (int)*srcPixel;
             if(mode == PAINT_OPAQUE){
-                *fbPixel = alpha;
-                *(fbPixel+1) = *(imgPixel + 1);
-                *(fbPixel+2) = *(imgPixel + 2);
-                *(fbPixel+3) = *(imgPixel + 3);
+                *dstPixel = alpha;
+                *(dstPixel+1) = *(srcPixel + 1);
+                *(dstPixel+2) = *(srcPixel + 2);
+                *(dstPixel+3) = *(srcPixel + 3);
             }else{ // PAINT_OVER
                 const int oneMinusAlpha= 255 - alpha;
                 for( int i=0; i<4; i++){
-                    fbPixel[i] = iclamp(imgPixel[i] + oneMinusAlpha * fbPixel[i] / 255, 0, 255);
+                    dstPixel[i] = iclamp(srcPixel[i] + oneMinusAlpha * dstPixel[i] / 255, 0, 255);
                 }
             }
         }
     }
 }
 
-void clearFramebuffer(Framebuffer* fb, uint8_t a, uint8_t r, uint8_t g, uint8_t b){
+void clear(Image * img, uint8_t a, uint8_t r, uint8_t g, uint8_t b){
     int32_t value = ((int32_t) b)<<24 | ((int32_t)g)<<16 | ((int32_t)r)<<8|a;
-    int32_t * v = (int32_t*) fb->pixels;
+    int32_t * v = (int32_t*) img->pixels;
 
-    for(int i=0;i<fb->width * fb->height; i++){
+    for(int i=0;i<img->width * img->height; i++){
         v[i] = value;
     }
 }

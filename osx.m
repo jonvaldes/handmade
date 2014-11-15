@@ -6,7 +6,7 @@ static NSWindow * g_window;
 static NSApplication * g_app;
 static CGContextRef g_context;
 static NSGraphicsContext * nsgfx_context; 
-static Framebuffer g_framebuffer;
+static Image g_framebuffer;
 
 void createWindow(int width, int height){
     g_app = [NSApplication sharedApplication];
@@ -74,7 +74,7 @@ void flushFramebuffer(){
     CGContextFlush (cgc);
 }
 
-Framebuffer * getFramebuffer(){
+Image * getFramebuffer(){
     return &g_framebuffer;
 }
 

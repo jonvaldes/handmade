@@ -22,8 +22,8 @@ int main(){
                 goto endGame;
             }
         }
-        Framebuffer * fb = getFramebuffer();
-        clearFramebuffer(fb, 0, 30, 140, 40);
+        Image * fb = getFramebuffer();
+        clear(fb, 0, 30, 140, 40);
 
         for(int i=0; i<20; i++){
             paint(PAINT_OVER, img, fb, 

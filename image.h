@@ -20,14 +20,7 @@ typedef enum{
     PAINT_OVER,
 } PaintMode;
 
+void clear(Image * img, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 
-typedef struct {
-    int width;
-    int height;
-    uint8_t * pixels;
-} Framebuffer;
-
-void clearFramebuffer(Framebuffer* fb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
-
-void paint(PaintMode mode, Image * img, Framebuffer * fb, int x, int y);
+void paint(PaintMode mode, Image * src, Image * dst, int x, int y);
 

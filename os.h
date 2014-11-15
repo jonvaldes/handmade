@@ -6,7 +6,7 @@
 void createWindow();
 void closeWindow();
 
-Framebuffer * getFramebuffer();
+Image * getFramebuffer();
 void flushFramebuffer();
 
 enum {
