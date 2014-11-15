@@ -2,6 +2,7 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hand_math.h"
 
 Image * loadTGAImage(const char * filename) {
     // Open file
@@ -17,7 +18,7 @@ Image * loadTGAImage(const char * filename) {
     size_t size = ftell(fd);
 
     // Mmap it
-    void * addr = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fileno(fd), 0);
+    void * addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fileno(fd), 0);
     if( addr == (void*) -1){
         goto errCloseFd;
     }
@@ -45,6 +46,17 @@ Image * loadTGAImage(const char * filename) {
     result->width = header->Width;
     result->height = header->Height;
     result->pixels = ((uint8_t* ) addr) + sizeof(header_t) + header->CMapLength * header->CMapDepth;
+    
+    // Premultiply alpha
+    uint8_t *p = result->pixels;
+    for(int i=0;i<result->width * result->height; i++){
+        int alpha = *p;
+        for(int j=0;j<4;j++){
+            p[j] = (uint8_t)(p[j] * alpha / 255);
+        }
+        p+=4;
+    }
+
     return result;
 
 errCloseFd:
@@ -56,6 +68,40 @@ void deleteImage(Image * img){
     munmap(img->_mmappedData, img->_mmapSize);
     fclose(img->_mmapFd);
     memset(img, 0, sizeof(Image));
+}
+
+void paint(PaintMode mode, Image * img, Framebuffer * fb, int xcenter, int ycenter){
+    const int startx = xcenter - img->width/2;
+    const int starty = ycenter - img->height/2;
+
+    for( int iy = 0 ; (iy < img->height) && (starty + iy < fb->height); iy++){
+        const int y = starty + iy;
+        if(y < 0){
+            continue;
+        }
+        
+        for( int ix = 0 ; (ix < img->width) && (startx + ix < fb->width) ; ix++){
+            const int x = startx + ix;
+            if(x < 0){
+                continue;
+            }
+            uint8_t * fbPixel = fb->pixels + 4*(x + fb->width * y);
+            uint8_t * imgPixel = img->pixels + 4*(ix + img->width*iy);
+
+            const int alpha = (int)*imgPixel;
+            if(mode == PAINT_OPAQUE){
+                *fbPixel = alpha;
+                *(fbPixel+1) = *(imgPixel + 1);
+                *(fbPixel+2) = *(imgPixel + 2);
+                *(fbPixel+3) = *(imgPixel + 3);
+            }else{ // PAINT_OVER
+                const int oneMinusAlpha= 255 - alpha;
+                for( int i=0; i<4; i++){
+                    fbPixel[i] = iclamp(imgPixel[i] + oneMinusAlpha * fbPixel[i] / 255, 0, 255);
+                }
+            }
+        }
+    }
 }
 
 /*

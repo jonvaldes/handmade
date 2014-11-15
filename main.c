@@ -21,21 +21,15 @@ int main(){
                 goto endGame;
             }
         }
-        unsigned char * fb = getFramebuffer();
-        for(int y=0;y<480;y++){
-            for(int x=0;x<640;x++){
-                int px = (x + framecnt) % img->width;
-                int py = (y + framecnt) % img->height;
-                // ARGB format!
-                uint8_t * pixel = img->pixels + 4*(px + py * img->width);
-                uint8_t alpha = *pixel;
+        Framebuffer * fb = getFramebuffer();
+        clearFramebuffer(fb, 0, 30, 140, 40);
 
-                fb[ (x + y * 640) * 4] = *(pixel+3);
-                fb[ (x + y * 640) * 4 + 1] = ((int)*(pixel+2)) * alpha / 255;
-                fb[ (x + y * 640) * 4 + 2] = ((int)*(pixel+1)) * alpha / 255;
-                fb[ (x + y * 640) * 4 + 3] = ((int)*(pixel+0)) * alpha / 255;
-            }
+        for(int i=0; i<20; i++){
+            paint(PAINT_OVER, img, fb, 
+                    (int)(fb->width / 2 + (i*20) * sin(i * 1.221 + framecnt * 0.01)),
+                    (int)(fb->height/ 2 + (i*20) * cos(i * 1.221 + framecnt * 0.01 )));
         }
+        
         flushFramebuffer();
         framecnt++;
     }

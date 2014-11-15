@@ -6,7 +6,7 @@ static NSWindow * g_window;
 static NSApplication * g_app;
 static CGContextRef g_context;
 static NSGraphicsContext * nsgfx_context; 
-static unsigned char * g_pixels;
+static Framebuffer g_framebuffer;
 
 void createWindow(int width, int height){
     g_app = [NSApplication sharedApplication];
@@ -32,11 +32,13 @@ void createWindow(int width, int height){
 
     CGColorSpaceRef cgColorspace = CGColorSpaceCreateDeviceRGB();
 
-    g_pixels = malloc(width * height * 4);
+    g_framebuffer.width = width;
+    g_framebuffer.height = height;
+    g_framebuffer.pixels = malloc(width * height * 4);
     nsgfx_context = [NSGraphicsContext graphicsContextWithWindow:g_window];
     [NSGraphicsContext setCurrentContext:nsgfx_context];
     
-    g_context = CGBitmapContextCreate (g_pixels, width, height, 8, 4 * width, cgColorspace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
+    g_context = CGBitmapContextCreate (g_framebuffer.pixels, width, height, 8, 4 * width, cgColorspace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
     CGColorSpaceRelease (cgColorspace);
 
     [NSApp activateIgnoringOtherApps:YES];
@@ -72,8 +74,8 @@ void flushFramebuffer(){
     CGContextFlush (cgc);
 }
 
-unsigned char * getFramebuffer(){
-    return g_pixels;
+Framebuffer * getFramebuffer(){
+    return &g_framebuffer;
 }
 
 void closeWindow(){
@@ -81,5 +83,5 @@ void closeWindow(){
 }
 
 /*
-# vi: ft=c
+# vi: ft=cpp
 */
