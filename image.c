@@ -48,13 +48,16 @@ Image * loadTGAImage(const char * filename) {
     result->pixels = ((uint8_t* ) addr) + sizeof(header_t) + header->CMapLength * header->CMapDepth;
     
     // Premultiply alpha
-    uint8_t *p = result->pixels;
     for(int i=0;i<result->width * result->height; i++){
-        int alpha = *p;
+        uint8_t *p = result->pixels + i*4;
+        int alpha = p[3];
         for(int j=0;j<4;j++){
             p[j] = (uint8_t)(p[j] * alpha / 255);
         }
-        p+=4;
+        // BGRA -> ARGB
+        uint8_t temp;
+        temp = p[0]; p[0] = p[3]; p[3] = temp;
+        temp = p[1]; p[1] = p[2]; p[2] = temp;
     }
 
     return result;
@@ -79,22 +82,20 @@ void paint(PaintMode mode, Image * src, Image * dst, int xcenter, int ycenter){
         if(y < 0){
             continue;
         }
-        
         for( int ix = 0 ; (ix < src->width) && (startx + ix < dst->width) ; ix++){
             const int x = startx + ix;
             if(x < 0){
                 continue;
             }
-            uint8_t * dstPixel = dst->pixels + 4*(x + dst->width * y);
+            uint8_t * dstPixel = dst->pixels + 4*( x + dst->width* y);
             uint8_t * srcPixel = src->pixels + 4*(ix + src->width*iy);
 
-            const int alpha = (int)*srcPixel;
             if(mode == PAINT_OPAQUE){
-                *dstPixel = alpha;
-                *(dstPixel+1) = *(srcPixel + 1);
-                *(dstPixel+2) = *(srcPixel + 2);
-                *(dstPixel+3) = *(srcPixel + 3);
+                for( int i=0; i<4; i++){
+                    dstPixel[i] = srcPixel[i];
+                }
             }else{ // PAINT_OVER
+                const int alpha = (int)srcPixel[0];
                 const int oneMinusAlpha= 255 - alpha;
                 for( int i=0; i<4; i++){
                     dstPixel[i] = iclamp(srcPixel[i] + oneMinusAlpha * dstPixel[i] / 255, 0, 255);
