@@ -7,4 +7,4 @@ function fail(){
 echo "osx.o"
 clang -ObjC -c osx.m -o osx.o || fail
 echo "main.c"
-clang -std=c99 -framework Cocoa -framework Foundation -lobjc main.c osx.o || fail
+clang -g -Wall -std=c99 -framework Cocoa -framework Foundation -lobjc main.c image.c osx.o || fail
