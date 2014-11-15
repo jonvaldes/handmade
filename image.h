@@ -1,7 +1,6 @@
 #pragma once
 #include <stdint.h>
 #include <stdio.h>
-#include "os.h"
 
 typedef struct{
     int width;
@@ -20,6 +19,15 @@ typedef enum{
     PAINT_OPAQUE,
     PAINT_OVER,
 } PaintMode;
+
+
+typedef struct {
+    int width;
+    int height;
+    uint8_t * pixels;
+} Framebuffer;
+
+void clearFramebuffer(Framebuffer* fb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 
 void paint(PaintMode mode, Image * img, Framebuffer * fb, int x, int y);
 
