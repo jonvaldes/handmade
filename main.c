@@ -20,13 +20,23 @@ int main() {
         exit(1);
     }
 
+    int mousePos[2] = {0, 0};
+
     while(1) {
         KeyEvent ev;
         profileBlockStart("eventHandling");
         while(pollEvent(&ev)) {
-            printf("Keycode: %d\n", ev.key);
-            if(ev.key == 53) {
-                goto endGame;
+            switch(ev.type) {
+            case KEY_DOWN:
+                printf("Keycode: %d\n", ev.key);
+                if(ev.key == 53) {
+                    goto endGame;
+                }
+                break;
+            case MOUSE_MOVE:
+                mousePos[0] = ev.posx;
+                mousePos[1] = ev.posy;
+                break;
             }
         }
         profileBlockEnd("eventHandling");
@@ -46,7 +56,7 @@ int main() {
         profileBlockStart("paintText");
         Color textColor = color(255, 200, 250, 255);
         textColor.a = (framecnt * 32) % 256;
-        drawText(fb, font, &textColor, "Hello world!", 120, 100);
+        drawText(fb, font, &textColor, "Hello world!", mousePos[0], mousePos[1]);
         drawButton(fb, font, "Click here!", 120, 200);
 
         profileBlockEnd("paintText");

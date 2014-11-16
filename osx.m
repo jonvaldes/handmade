@@ -46,6 +46,7 @@ void createWindow(int width, int height){
 }
 
 bool pollEvent(KeyEvent * ev){
+    NSPoint p;
     NSDate * distantPast = [ NSDate distantPast ];
     NSEvent * event = [ NSApp nextEventMatchingMask:NSAnyEventMask untilDate:distantPast inMode: NSDefaultRunLoopMode dequeue:YES ];
     if(event != nil){
@@ -55,14 +56,34 @@ bool pollEvent(KeyEvent * ev){
                 ev->type = KEY_UP;
                 ev->key = [event keyCode];
                 return true;
+
             case NSKeyDown:
                 ev->type = KEY_DOWN;
                 ev->key = [event keyCode];
                 return true;
-            // We're not handling mouse events right now
+
+            case NSLeftMouseDown:
+            case NSRightMouseDown:
+                ev->type = MOUSE_DOWN;
+                goto getMouseCoords;
+
+            case NSLeftMouseUp:
+            case NSRightMouseUp:
+                ev->type = MOUSE_UP;
+                goto getMouseCoords;
+
+            case NSMouseMoved:
+                ev->type = MOUSE_MOVE;
+                goto getMouseCoords;
         }
     }
     return false;
+
+getMouseCoords: 
+    p = [event locationInWindow];
+    ev->posx = p.x;
+    ev->posy = g_framebuffer.height - p.y;
+    return true;
 }
 
 void flushFramebuffer(){
