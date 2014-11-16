@@ -1,2 +1,2 @@
 #!/bin/bash
-./build.sh && ./handmade
+make && ./handmade

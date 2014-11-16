@@ -40,6 +40,3 @@ Color color(uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 void clear(Image* img, const Color* c);
 
 void paint(PaintMode mode, Image* src, Image* dst, int x, int y);
-void drawText(Image* dest, const Image* font, const Color* c, const char* text, int destX, int destY);
-void textSize(Image* font, const char* text, int* width, int* height);
-void drawButton(Image* dest, Image* font, const char* text, int x, int y);
