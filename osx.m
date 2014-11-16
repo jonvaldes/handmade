@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #include <stdio.h>
 #include "os.h"
+#include <mach/mach_time.h>
 
 static NSWindow * g_window;
 static NSApplication * g_app;
@@ -80,6 +81,16 @@ Image * getFramebuffer(){
 
 void closeWindow(){
     [g_window close];
+}
+
+uint64_t nanoTime(){
+    /* Get the timebase info */
+    mach_timebase_info_data_t info;
+    mach_timebase_info(&info);
+    
+    uint64_t t = mach_absolute_time();
+    /* Convert to nanoseconds */
+    return t * info.numer / info.denom;
 }
 
 /*

@@ -2,7 +2,6 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hand_math.h"
 
 Image * loadTGAImage(const char * filename) {
     // Open file
@@ -90,15 +89,16 @@ void paint(PaintMode mode, Image * src, Image * dst, int xcenter, int ycenter){
             uint8_t * dstPixel = dst->pixels + 4*( x + dst->width* y);
             uint8_t * srcPixel = src->pixels + 4*(ix + src->width*iy);
 
-            if(mode == PAINT_OPAQUE){
-                for( int i=0; i<4; i++){
-                    dstPixel[i] = srcPixel[i];
-                }
+            if(mode == PAINT_OPAQUE || srcPixel[0] == 0xFF){
+                *((uint32_t*)dstPixel) = *((uint32_t*)srcPixel);
             }else{ // PAINT_OVER
                 const int alpha = (int)srcPixel[0];
+                if(alpha == 0){
+                    continue;
+                }
                 const int oneMinusAlpha= 255 - alpha;
                 for( int i=0; i<4; i++){
-                    dstPixel[i] = iclamp(srcPixel[i] + oneMinusAlpha * dstPixel[i] / 255, 0, 255);
+                    dstPixel[i] = 0xFF & (srcPixel[i] + oneMinusAlpha * dstPixel[i] / 255);
                 }
             }
         }

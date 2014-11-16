@@ -21,6 +21,8 @@ typedef struct {
 
 bool pollEvent(KeyEvent * ev);
 
+// Current timestamp in nanosecs
+uint64_t nanoTime();
 
 
 
