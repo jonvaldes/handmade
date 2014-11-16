@@ -50,7 +50,7 @@ Image* loadTGAImage(const char* filename) {
     for(int i = 0; i < result->width * result->height; i++) {
         uint8_t* p = result->pixels + i * 4;
         int alpha = p[3];
-        for(int j = 0; j < 4; j++) {
+        for(int j = 0; j < 3; j++) {
             p[j] = (uint8_t)(p[j] * alpha / 255);
         }
         // BGRA -> ARGB
@@ -110,8 +110,8 @@ void paint(PaintMode mode, Image* src, Image* dst, int xcenter, int ycenter) {
 }
 
 void clear(Image* img, uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
-    int32_t value = ((int32_t)b) << 24 | ((int32_t)g) << 16 | ((int32_t)r) << 8 | a;
-    int32_t* v = (int32_t*)img->pixels;
+    uint32_t value = ((uint32_t)b) << 24 | ((uint32_t)g) << 16 | ((uint32_t)r) << 8 | a;
+    uint32_t* v = (uint32_t*)img->pixels;
 
     for(int i = 0; i < img->width * img->height; i++) {
         v[i] = value;
