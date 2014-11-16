@@ -32,7 +32,8 @@ int main() {
         profileBlockEnd("eventHandling");
         Image* fb = getFramebuffer();
         profileBlockStart("clearFramebuffer");
-        clear(fb, 0, 30, 140, 40);
+        Color backColor = color(0, 30, 140, 40);
+        clear(fb, &backColor);
         profileBlockEnd("clearFramebuffer");
 
         profileBlockStart("paintCats");
@@ -43,16 +44,10 @@ int main() {
         profileBlockEnd("paintCats");
 
         profileBlockStart("paintText");
-        Color textColor = col(255, 200, 250, 255);
+        Color textColor = color(255, 200, 250, 255);
         textColor.a = (framecnt * 32) % 256;
         drawText(fb, font, &textColor, "Hello world!", 120, 100);
-
-        textColor.a = 255;
-        textColor.r = (framecnt * 7) % 256;
-        textColor.g = 255 - textColor.r;
-        textColor.b = 10;
-        drawText(fb, font, &textColor, "This is the first multiline\ntext here! woot!! *** \\o/ :-D (^_^)/",
-                 120, 116);
+        drawButton(fb, font, "Click here!", 120, 200);
 
         profileBlockEnd("paintText");
 
