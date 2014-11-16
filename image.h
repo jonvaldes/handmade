@@ -20,6 +20,21 @@ typedef enum {
     PAINT_OVER,
 } PaintMode;
 
+typedef struct {
+    union {
+        struct {
+            uint8_t a;
+            uint8_t r;
+            uint8_t g;
+            uint8_t b;
+        };
+        uint8_t c[4];
+    };
+} Color;
+
+Color col(uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+
 void clear(Image* img, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 
 void paint(PaintMode mode, Image* src, Image* dst, int x, int y);
+void drawText(Image* dest, const Image* font, const Color* c, const char* text, int destX, int destY);

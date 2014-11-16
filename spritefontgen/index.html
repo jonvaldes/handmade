@@ -1,0 +1,30 @@
+<html>
+
+    <body>
+    </body>
+    <script>
+        var c = document.createElement("canvas");
+        document.body.appendChild(c);
+        var fontWidth = 12;
+        var fontHeight = 16;
+
+        c.width = fontWidth;
+        c.height = fontHeight * 256;
+
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0,0,c.width, c.height);
+        ctx.font = "14px Monospace"; 
+        ctx.fillStyle = "#FFFFFF";
+        /*
+        for( var i=0;i<255;i++){
+            ctx.fillRect(0,i*fontHeight, fontWidth, 1);
+        }*/
+        for( var i=0;i<255;i++){
+            ctx.fillText(String.fromCharCode(i), 1 , (i+1) * fontHeight-3);
+        }
+        var dataURL = c.toDataURL();
+        c.src = dataURL;
+        
+    </script>
+</html>

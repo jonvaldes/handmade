@@ -118,6 +118,59 @@ void clear(Image* img, uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
     }
 }
 
+Color col(uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
+    Color res;
+    res.a = a;
+    res.r = r;
+    res.g = g;
+    res.b = b;
+    return res;
+}
+
+void drawText(Image* dest, const Image* font, const Color* c, const char* text, int destX, int destY) {
+    int fontWidth = font->width;
+    int fontHeight = font->height / 256;
+
+    int lineDestX = destX;
+    while(*text) {
+        unsigned char t = *(unsigned char*)text;
+
+        if(t == '\n') {
+            lineDestX = destX;
+            destY += fontHeight;
+            text++;
+            continue;
+        }
+
+        int origy = t * fontHeight;
+
+        for(int y = 0; (y < fontHeight) && (destY + y < dest->height); y++) {
+            if(destY + y < 0) {
+                continue;
+            }
+            uint8_t* destRow = dest->pixels + 4 * (destY + y) * dest->width;
+            for(int x = 0; x < fontWidth; x++) {
+                if((lineDestX + x >= dest->width) || (lineDestX + x < 0)) {
+                    continue;
+                }
+                uint8_t* origP = &font->pixels[4 * (x + (y + origy) * fontWidth)];
+                uint8_t* destP = destRow + 4 * (lineDestX + x);
+                int alpha = (int)origP[0];
+                if(alpha == 0) {
+                    continue;
+                }
+                const int oneMinusAlpha = 255 - (alpha * (int)c->a / 255);
+                for(int i = 0; i < 4; i++) {
+                    destP[i] = 0xFF & (origP[i] * (int)c->c[i] / 255 * (int)c->a / 255 +
+                                       oneMinusAlpha * destP[i] / 255);
+                }
+            }
+        }
+        lineDestX += fontWidth;
+        text++;
+    }
+}
+
 /*
 vi: ft=cpp
 */
