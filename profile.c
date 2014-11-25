@@ -51,6 +51,7 @@ void saveProfile(const char* filename) {
     fprintf(fd,
             "{\"cat\":\"__metadata\",\"pid\":1,\"tid\": "
             "0,\"ts\":0,\"ph\":\"M\",\"name\":\"thread_name\",\"args\":{\"name\":\"main\"}}]}");
+    fclose(fd);
 }
 /*
 vi: ft=cpp
